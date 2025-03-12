@@ -1,0 +1,55 @@
+{
+  "common": {
+    "home": "Trang chủ",
+    "products": "Sản phẩm",
+    "cart": "Giỏ hàng",
+    "account": "Tài khoản",
+    "login": "Đăng nhập",
+    "register": "Đăng ký",
+    "logout": "Đăng xuất",
+    "search": "Tìm kiếm",
+    "darkMode": "Chế độ tối",
+    "language": "Ngôn ngữ"
+  },
+  "product": {
+    "buy": "Mua ngay",
+    "addToCart": "Thêm vào giỏ",
+    "price": "Giá",
+    "description": "Mô tả",
+    "features": "Tính năng",
+    "requirements": "Cấu hình yêu cầu",
+    "license": "Thông tin bản quyền"
+  },
+  "cart": {
+    "empty": "Giỏ hàng trống",
+    "total": "Tổng cộng",
+    "checkout": "Thanh toán",
+    "remove": "Xóa"
+  },
+  "auth": {
+    "email": "Email",
+    "emailPlaceholder": "Nhập email của bạn",
+    "password": "Mật khẩu",
+    "passwordPlaceholder": "Nhập mật khẩu",
+    "confirmPassword": "Xác nhận mật khẩu",
+    "confirmPasswordPlaceholder": "Nhập lại mật khẩu",
+    "fullName": "Họ và tên",
+    "fullNamePlaceholder": "Nhập họ và tên của bạn",
+    "forgotPassword": "Quên mật khẩu?",
+    "rememberMe": "Ghi nhớ đăng nhập",
+    "noAccount": "Chưa có tài khoản?",
+    "haveAccount": "Đã có tài khoản?",
+    "acceptTerms": "Tôi đồng ý với",
+    "termsAndConditions": "Điều khoản và điều kiện",
+    "loggingIn": "Đang đăng nhập...",
+    "registering": "Đang tạo tài khoản..."
+  },
+  "admin": {
+    "dashboard": "Bảng điều khiển",
+    "products": "Sản phẩm",
+    "orders": "Đơn hàng",
+    "customers": "Khách hàng",
+    "licenses": "Giấy phép",
+    "settings": "Cài đặt"
+  }
+} 

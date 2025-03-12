@@ -1,0 +1,55 @@
+{
+  "common": {
+    "home": "Home",
+    "products": "Products",
+    "cart": "Cart",
+    "account": "Account",
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "search": "Search",
+    "darkMode": "Dark Mode",
+    "language": "Language"
+  },
+  "product": {
+    "buy": "Buy Now",
+    "addToCart": "Add to Cart",
+    "price": "Price",
+    "description": "Description",
+    "features": "Features",
+    "requirements": "System Requirements",
+    "license": "License Details"
+  },
+  "cart": {
+    "empty": "Your cart is empty",
+    "total": "Total",
+    "checkout": "Checkout",
+    "remove": "Remove"
+  },
+  "auth": {
+    "email": "Email",
+    "emailPlaceholder": "Enter your email",
+    "password": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "confirmPassword": "Confirm Password",
+    "confirmPasswordPlaceholder": "Re-enter your password",
+    "fullName": "Full Name",
+    "fullNamePlaceholder": "Enter your full name",
+    "forgotPassword": "Forgot Password?",
+    "rememberMe": "Remember Me",
+    "noAccount": "Don't have an account?",
+    "haveAccount": "Already have an account?",
+    "acceptTerms": "I agree to the",
+    "termsAndConditions": "Terms and Conditions",
+    "loggingIn": "Logging in...",
+    "registering": "Creating account..."
+  },
+  "admin": {
+    "dashboard": "Dashboard",
+    "products": "Products",
+    "orders": "Orders",
+    "customers": "Customers",
+    "licenses": "Licenses",
+    "settings": "Settings"
+  }
+} 
