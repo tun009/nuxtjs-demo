@@ -173,6 +173,12 @@
 </template>
 
 <script setup>
+import { useNuxtApp } from '#app'
+import { useRouter } from 'vue-router'
+
+const { $auth } = useNuxtApp();
+const router = useRouter();
+
 const name = ref('')
 const email = ref('')
 const password = ref('')
@@ -203,18 +209,15 @@ const handleRegister = async () => {
     loading.value = true
     error.value = ''
 
-    // Implement registration logic here
-    console.log('Registration attempt:', {
-      name: name.value,
-      email: email.value,
-      password: password.value
-    })
-
-    // Simulate API call
+    // Trong thực tế, bạn sẽ gọi API để đăng ký
+    // Đây là mã giả, giả lập đăng ký thành công và chuyển hướng đến trang đăng nhập
     await new Promise(resolve => setTimeout(resolve, 1000))
-
-    // On success, redirect to login or dashboard
-    // navigateTo('/auth/login')
+    
+    // Chuyển hướng đến trang đăng nhập với thông báo thành công
+    router.push({
+      path: '/auth/login',
+      query: { registered: 'true' }
+    })
   } catch (err) {
     error.value = err.message || 'An error occurred during registration'
   } finally {

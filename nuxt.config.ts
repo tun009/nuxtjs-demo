@@ -7,25 +7,25 @@ export default defineNuxtConfig({
     '@nuxtjs/color-mode',
     '@pinia/nuxt',
     '@nuxt/icon',
-    ['@nuxtjs/i18n', {
-      locales: [
-        {
-          code: 'en',
-          name: 'English',
-          file: 'en.json'
-        },
-        {
-          code: 'vi',
-          name: 'Tiếng Việt',
-          file: 'vi.json'
-        }
-      ],
-      lazy: true,
-      langDir: 'locales',
-      defaultLocale: 'en',
-      strategy: 'prefix_except_default'
-    }]
+    '@nuxtjs/i18n'
   ],
+
+  i18n: {
+    defaultLocale: 'en',
+    lazy: true,
+    langDir: 'locales',
+    locales: [
+      {
+        code: 'en',
+        file: 'en.json'
+      },
+      {
+        code: 'vi',
+        file: 'vi.json'
+      }
+    ],
+    strategy: 'prefix_except_default'
+  },
 
   css: ['~/assets/css/main.css'],
 
@@ -50,6 +50,20 @@ export default defineNuxtConfig({
         { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
       ]
     }
+  },
+
+  // Cấu hình SSR/CSR cho từng trang
+  routeRules: {
+    // Các trang cần SEO sử dụng SSR
+    '/': { ssr: true },
+    '/products': { ssr: true },
+    '/products/*': { ssr: true },
+    
+    // Các trang không cần SEO sử dụng CSR
+    '/user/**': { ssr: false },
+    '/admin/**': { ssr: false },
+    '/auth/**': { ssr: false },
+    '/cart': { ssr: false }
   },
 
   compatibilityDate: '2025-03-12'
