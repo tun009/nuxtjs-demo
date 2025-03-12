@@ -51,5 +51,23 @@
     "customers": "Customers",
     "licenses": "Licenses",
     "settings": "Settings"
+  },
+  "products": {
+    "keyFeatures": "Key Features",
+    "technicalSpecs": "Technical Specifications",
+    "choosePlan": "Choose Your Plan",
+    "choosePlanDescription": "Select the best plan that suits your needs",
+    "devices": "Devices",
+    "timeOfUse": "Time of Use",
+    "genuineLicense": "Genuine License",
+    "buyNow": "Buy Now",
+    "unavailable": "Currently Unavailable",
+    "reviews": "Reviews",
+    "learnMore": "Learn More",
+    "notFound": {
+      "title": "Product Not Found",
+      "description": "The product you're looking for doesn't exist or has been removed.",
+      "browseProducts": "Browse Products"
+    }
   }
 } 

@@ -19,9 +19,6 @@
           <NuxtLink to="/products" class="text-gray-300 hover:text-white transition-colors">
             {{ $t('common.products') }}
           </NuxtLink>
-          <NuxtLink to="/cart" class="text-gray-300 hover:text-white transition-colors">
-            {{ $t('common.cart') }}
-          </NuxtLink>
         </div>
 
         <!-- Right Actions -->

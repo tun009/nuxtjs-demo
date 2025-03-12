@@ -51,5 +51,23 @@
     "customers": "Khách hàng",
     "licenses": "Giấy phép",
     "settings": "Cài đặt"
+  },
+  "products": {
+    "keyFeatures": "Tính năng chính",
+    "technicalSpecs": "Thông số kỹ thuật",
+    "choosePlan": "Chọn gói phù hợp",
+    "choosePlanDescription": "Lựa chọn gói dịch vụ phù hợp với nhu cầu của bạn",
+    "devices": "Thiết bị",
+    "timeOfUse": "Thời gian sử dụng",
+    "genuineLicense": "Bản quyền chính hãng",
+    "buyNow": "Mua ngay",
+    "unavailable": "Tạm hết hàng",
+    "reviews": "Đánh giá",
+    "learnMore": "Tìm hiểu thêm",
+    "notFound": {
+      "title": "Không tìm thấy sản phẩm",
+      "description": "Sản phẩm bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.",
+      "browseProducts": "Xem các sản phẩm khác"
+    }
   }
 } 
