@@ -66,5 +66,16 @@ export default defineNuxtConfig({
     '/cart': { ssr: false }
   },
 
+  // Cấu hình runtime config
+  runtimeConfig: {
+    // Private keys are only available on the server
+    apiSecret: process.env.API_SECRET,
+    
+    // Public keys that are exposed to the client
+    public: {
+      apiBaseUrl: process.env.API_BASE_URL || 'https://ipa.viettelai.vn/eximbank-app'
+    }
+  },
+
   compatibilityDate: '2025-03-12'
 })

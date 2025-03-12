@@ -60,16 +60,16 @@
       <form class="mt-8 space-y-6" @submit.prevent="handleLogin">
         <div class="rounded-md shadow-sm -space-y-px">
           <div>
-            <label for="email-address" class="sr-only">Email address</label>
+            <label for="email-address" class="sr-only">Email or Username</label>
             <input
               id="email-address"
               v-model="form.email"
               name="email"
-              type="email"
+              type="text"
               autocomplete="email"
               required
               class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-              placeholder="Email address"
+              placeholder="Email or Username"
             />
           </div>
           <div>
@@ -173,11 +173,11 @@
           </button>
           <button
             type="button"
-            @click="fillUserCredentials"
+            @click="fillOcrAdminCredentials"
             class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
           >
             <Icon name="heroicons:user" class="h-5 w-5 mr-2 text-gray-500" />
-            Regular User
+            OCR Admin
           </button>
         </div>
       </div>
@@ -188,7 +188,7 @@
 <script setup>
 import { useAuth } from "~/middleware/admin";
 
-const { login } = useAuth();
+const { login, currentUser } = useAuth();
 const router = useRouter();
 const route = useRoute();
 
@@ -214,7 +214,7 @@ const handleLogin = async () => {
 
   // Validate form
   if (!form.value.email || !form.value.password) {
-    errorMessage.value = "Please enter both email and password";
+    errorMessage.value = "Please enter both email/username and password";
     return;
   }
 
@@ -225,10 +225,14 @@ const handleLogin = async () => {
     const success = login(form.value.email, form.value.password);
 
     if (success) {
-      // Redirect to the requested page or dashboard
-      router.push(redirectPath.value);
+      // Kiểm tra role và chuyển hướng
+      if (currentUser.value?.role === 'admin') {
+        router.push('/admin');
+      } else {
+        router.push('/user/dashboard');
+      }
     } else {
-      errorMessage.value = "Invalid email or password";
+      errorMessage.value = "Invalid email/username or password";
     }
   } catch (error) {
     console.error("Login error:", error);
@@ -244,8 +248,8 @@ const fillAdminCredentials = () => {
   form.value.password = "admin";
 };
 
-const fillUserCredentials = () => {
-  form.value.email = "user@example.com";
-  form.value.password = "user";
+const fillOcrAdminCredentials = () => {
+  form.value.email = "ocr_admin";
+  form.value.password = "123456aA@";
 };
 </script>

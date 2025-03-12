@@ -1,8 +1,8 @@
 export default defineNuxtRouteMiddleware((to, from) => {
-  const { currentUser } = useAuth();
+  const { currentUser, isAdmin } = useAuth();
   
   // Kiểm tra nếu người dùng đã đăng nhập và là admin
-  if (!currentUser.value || currentUser.value.email !== 'admin@example.com') {
+  if (!currentUser.value || currentUser.value.role !== 'admin') {
     // Redirect về trang login với thông báo
     return navigateTo('/auth/login?message=You must be an admin to access this page&redirect=' + to.fullPath);
   }
@@ -16,7 +16,11 @@ function useAuth() {
     if (process.client) {
       const savedUser = localStorage.getItem('currentUser');
       if (savedUser) {
-        return JSON.parse(savedUser);
+        try {
+          return JSON.parse(savedUser);
+        } catch (e) {
+          return null;
+        }
       }
     }
     return null;
@@ -47,6 +51,30 @@ function useAuth() {
         name: 'Regular User',
         email: 'user@example.com',
         role: 'user'
+      };
+      
+      currentUser.value = user;
+      
+      // Lưu vào localStorage
+      if (process.client) {
+        localStorage.setItem('currentUser', JSON.stringify(user));
+      }
+      
+      return true;
+    } else if (email === 'ocr_admin' && password === '123456aA@') {
+      // Thêm tài khoản demo từ API
+      const user = {
+        id: 1,
+        name: 'OCR Admin',
+        email: 'ocr_admin',
+        role: 'admin',
+        branch: {
+          id: 217,
+          name: 'Hội sở chính',
+          code: '1'
+        },
+        status: 'ACTIVE',
+        firstLogin: false
       };
       
       currentUser.value = user;
