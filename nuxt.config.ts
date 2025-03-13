@@ -9,7 +9,10 @@ export default defineNuxtConfig({
     '@nuxt/icon',
     '@nuxtjs/i18n'
   ],
-
+  devServer: {
+    port: 8080,
+    host: 'localhost'
+  },
   i18n: {
     defaultLocale: 'en',
     lazy: true,
