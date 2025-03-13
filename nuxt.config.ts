@@ -11,7 +11,7 @@ export default defineNuxtConfig({
   ],
   devServer: {
     port: 8080,
-    host: 'localhost'
+    host: '0.0.0.0'
   },
   i18n: {
     defaultLocale: 'en',
@@ -76,9 +76,18 @@ export default defineNuxtConfig({
     
     // Public keys that are exposed to the client
     public: {
-      apiBaseUrl: process.env.API_BASE_URL || 'https://ipa.viettelai.vn/eximbank-app'
+      apiBaseUrl: process.env.API_BASE_URL || 'http://ngochoaitn.ddns.net:8081'
     }
   },
 
-  compatibilityDate: '2025-03-12'
+  compatibilityDate: '2025-03-12',
+
+  components: {
+    dirs: [
+      {
+        path: '~/components',
+        pathPrefix: false,
+      },
+    ],
+  },
 })

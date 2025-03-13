@@ -1,7 +1,15 @@
 <template>
-  <NuxtLayout>
-    <NuxtPage />
-  </NuxtLayout>
+  <div>
+    <NuxtLayout>
+      <NuxtPage />
+      <PageLoading />
+    </NuxtLayout>
+
+    <!-- Toast component -->
+    <Toast />
+
+    <!-- Page loading -->
+  </div>
 </template>
 
 <script setup>

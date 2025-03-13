@@ -1,194 +1,260 @@
 <template>
   <div
-    class="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4 sm:px-6 lg:px-8"
+    class="min-h-screen flex flex-col bg-gradient-to-br from-blue-900 via-indigo-800 to-purple-900"
   >
-    <div class="max-w-md w-full space-y-8">
-      <div>
-        <h2
-          class="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white"
+    <!-- Particles background -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+      <div class="absolute inset-0 opacity-20">
+        <div
+          v-for="i in 20"
+          :key="i"
+          class="particle absolute rounded-full bg-white"
+          :style="{
+            width: `${Math.random() * 6 + 1}px`,
+            height: `${Math.random() * 6 + 1}px`,
+            top: `${Math.random() * 100}%`,
+            left: `${Math.random() * 100}%`,
+            animationDelay: `${Math.random() * 5}s`,
+            animationDuration: `${Math.random() * 10 + 10}s`,
+          }"
+        ></div>
+      </div>
+    </div>
+
+    <!-- Logo and branding -->
+    <div class="flex-none pt-10 px-4 sm:px-6 lg:px-8 flex justify-center">
+      <div class="text-center">
+        <h1
+          class="text-3xl font-bold text-white flex items-center justify-center"
         >
-          Sign in to your account
-        </h2>
-        <p class="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
-          Or
-          <NuxtLink
-            to="/auth/register"
-            class="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
+          <Icon
+            name="heroicons:cube-transparent"
+            class="h-8 w-8 mr-2 text-blue-400"
+          />
+          <span
+            class="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400"
           >
-            create a new account
-          </NuxtLink>
+            Software License Store
+          </span>
+        </h1>
+        <p class="mt-2 text-blue-200 text-sm">
+          Manage your software licenses in one place
         </p>
       </div>
+    </div>
 
-      <!-- Alert message -->
+    <!-- Login form -->
+    <div
+      class="flex-grow flex items-center justify-center px-4 sm:px-6 lg:px-8 py-10"
+    >
       <div
-        v-if="message"
-        class="bg-yellow-50 border-l-4 border-yellow-400 p-4 dark:bg-yellow-900/20 dark:border-yellow-600"
+        class="max-w-md w-full bg-white/10 backdrop-blur-lg rounded-2xl shadow-xl overflow-hidden"
       >
-        <div class="flex">
-          <div class="flex-shrink-0">
-            <Icon
-              name="heroicons:exclamation-triangle"
-              class="h-5 w-5 text-yellow-400"
-            />
-          </div>
-          <div class="ml-3">
-            <p class="text-sm text-yellow-700 dark:text-yellow-200">
-              {{ message }}
+        <div class="px-6 py-8 sm:px-10">
+          <div class="mb-6 text-center">
+            <h2 class="text-2xl font-bold text-white">
+              Sign in to your account
+            </h2>
+            <p class="mt-2 text-sm text-blue-200">
+              Don't have an account?
+              <NuxtLink
+                to="/auth/register"
+                class="font-medium text-blue-400 hover:text-blue-300 transition-colors"
+              >
+                Register
+              </NuxtLink>
             </p>
+          </div>
+
+          <!-- Alert message -->
+          <div
+            v-if="message"
+            class="mb-6 bg-yellow-900/30 border border-yellow-700 rounded-lg p-4"
+          >
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <Icon
+                  name="heroicons:exclamation-triangle"
+                  class="h-5 w-5 text-yellow-500"
+                />
+              </div>
+              <div class="ml-3">
+                <p class="text-sm text-yellow-200">
+                  {{ message }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Error message -->
+          <div
+            v-if="errorMessage"
+            class="mb-6 bg-red-900/30 border border-red-700 rounded-lg p-4"
+          >
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <Icon name="heroicons:x-circle" class="h-5 w-5 text-red-500" />
+              </div>
+              <div class="ml-3">
+                <p class="text-sm text-red-200">
+                  {{ errorMessage }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <form class="space-y-6" @submit.prevent="handleLogin">
+            <div>
+              <label
+                for="email-address"
+                class="block text-sm font-medium text-blue-200"
+              >
+                Email or Username
+              </label>
+              <div class="mt-1 relative">
+                <div
+                  class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                >
+                  <Icon
+                    name="heroicons:envelope"
+                    class="h-5 w-5 text-blue-400"
+                  />
+                </div>
+                <input
+                  id="email-address"
+                  v-model="form.email"
+                  name="email"
+                  type="text"
+                  autocomplete="email"
+                  required
+                  class="appearance-none block w-full pl-10 pr-3 py-2 border border-blue-700 rounded-lg bg-blue-900/30 placeholder-blue-400 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  placeholder="Enter your email or username"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label
+                for="password"
+                class="block text-sm font-medium text-blue-200"
+              >
+                Password
+              </label>
+              <div class="mt-1 relative">
+                <div
+                  class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                >
+                  <Icon
+                    name="heroicons:lock-closed"
+                    class="h-5 w-5 text-blue-400"
+                  />
+                </div>
+                <input
+                  id="password"
+                  v-model="form.password"
+                  name="password"
+                  :type="showPassword ? 'text' : 'password'"
+                  autocomplete="current-password"
+                  required
+                  class="appearance-none block w-full pl-10 pr-10 py-2 border border-blue-700 rounded-lg bg-blue-900/30 placeholder-blue-400 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  placeholder="Enter your password"
+                />
+                <button
+                  type="button"
+                  @click="togglePasswordVisibility"
+                  class="absolute inset-y-0 right-0 pr-3 flex items-center"
+                >
+                  <Icon
+                    :name="
+                      showPassword ? 'heroicons:eye-slash' : 'heroicons:eye'
+                    "
+                    class="h-5 w-5 text-blue-400 hover:text-blue-300 transition-colors"
+                  />
+                </button>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <div class="flex items-center">
+                <input
+                  id="remember-me"
+                  v-model="form.rememberMe"
+                  name="remember-me"
+                  type="checkbox"
+                  class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-blue-700 rounded bg-blue-900/30"
+                />
+                <label
+                  for="remember-me"
+                  class="ml-2 block text-sm text-blue-200"
+                >
+                  Remember me
+                </label>
+              </div>
+
+              <div class="text-sm">
+                <NuxtLink
+                  to="/auth/forgot-password"
+                  class="font-medium text-blue-400 hover:text-blue-300 transition-colors"
+                >
+                  Forgot password?
+                </NuxtLink>
+              </div>
+            </div>
+
+            <div>
+              <ButtonLoading
+                type="submit"
+                :loading="isSubmitting"
+                variant="primary"
+                class="w-full"
+              >
+                <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                  <Icon
+                    name="heroicons:lock-closed"
+                    class="h-5 w-5 text-blue-300 group-hover:text-blue-200"
+                  />
+                </span>
+                {{ isSubmitting ? "Signing in..." : "Sign in" }}
+              </ButtonLoading>
+            </div>
+          </form>
+
+          <!-- Quick login button -->
+          <div class="mt-6">
+            <button
+              type="button"
+              @click="loginAsAdmin"
+              class="w-full inline-flex justify-center py-2 px-4 border border-blue-700 rounded-lg shadow-sm bg-blue-900/30 text-sm font-medium text-blue-200 hover:bg-blue-800/40 transition-colors"
+            >
+              <Icon
+                name="heroicons:user-circle"
+                class="h-5 w-5 mr-2 text-blue-400"
+              />
+              Admin Login
+            </button>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- Error message -->
-      <div
-        v-if="errorMessage"
-        class="bg-red-50 border-l-4 border-red-400 p-4 dark:bg-red-900/20 dark:border-red-600"
-      >
-        <div class="flex">
-          <div class="flex-shrink-0">
-            <Icon name="heroicons:x-circle" class="h-5 w-5 text-red-400" />
-          </div>
-          <div class="ml-3">
-            <p class="text-sm text-red-700 dark:text-red-200">
-              {{ errorMessage }}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <form class="mt-8 space-y-6" @submit.prevent="handleLogin">
-        <div class="rounded-md shadow-sm -space-y-px">
-          <div>
-            <label for="email-address" class="sr-only">Email or Username</label>
-            <input
-              id="email-address"
-              v-model="form.email"
-              name="email"
-              type="text"
-              autocomplete="email"
-              required
-              class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-              placeholder="Email or Username"
-            />
-          </div>
-          <div>
-            <label for="password" class="sr-only">Password</label>
-            <input
-              id="password"
-              v-model="form.password"
-              name="password"
-              type="password"
-              autocomplete="current-password"
-              required
-              class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-              placeholder="Password"
-            />
-          </div>
-        </div>
-
-        <div class="flex items-center justify-between">
-          <div class="flex items-center">
-            <input
-              id="remember-me"
-              v-model="form.rememberMe"
-              name="remember-me"
-              type="checkbox"
-              class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600"
-            />
-            <label
-              for="remember-me"
-              class="ml-2 block text-sm text-gray-900 dark:text-gray-300"
-            >
-              Remember me
-            </label>
-          </div>
-
-          <div class="text-sm">
-            <NuxtLink
-              to="/auth/forgot-password"
-              class="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
-            >
-              Forgot your password?
-            </NuxtLink>
-          </div>
-        </div>
-
-        <div>
-          <button
-            type="submit"
-            class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-            :disabled="isSubmitting"
-          >
-            <span
-              v-if="isSubmitting"
-              class="absolute left-0 inset-y-0 flex items-center pl-3"
-            >
-              <Icon
-                name="heroicons:arrow-path"
-                class="h-5 w-5 text-blue-400 animate-spin"
-              />
-            </span>
-            <span
-              v-else
-              class="absolute left-0 inset-y-0 flex items-center pl-3"
-            >
-              <Icon
-                name="heroicons:lock-closed"
-                class="h-5 w-5 text-blue-500 group-hover:text-blue-400"
-              />
-            </span>
-            {{ isSubmitting ? "Signing in..." : "Sign in" }}
-          </button>
-        </div>
-      </form>
-
-      <!-- Demo credentials -->
-      <div class="mt-6">
-        <div class="relative">
-          <div class="absolute inset-0 flex items-center">
-            <div
-              class="w-full border-t border-gray-300 dark:border-gray-700"
-            ></div>
-          </div>
-          <div class="relative flex justify-center text-sm">
-            <span
-              class="px-2 bg-gray-100 dark:bg-gray-900 text-gray-500 dark:text-gray-400"
-              >Demo credentials</span
-            >
-          </div>
-        </div>
-
-        <div class="mt-6 grid grid-cols-2 gap-3">
-          <button
-            type="button"
-            @click="fillAdminCredentials"
-            class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
-          >
-            <Icon
-              name="heroicons:user-circle"
-              class="h-5 w-5 mr-2 text-gray-500"
-            />
-            Admin User
-          </button>
-          <button
-            type="button"
-            @click="fillOcrAdminCredentials"
-            class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
-          >
-            <Icon name="heroicons:user" class="h-5 w-5 mr-2 text-gray-500" />
-            OCR Admin
-          </button>
-        </div>
+    <!-- Footer -->
+    <div class="flex-none py-6 px-4 sm:px-6 lg:px-8">
+      <div class="text-center text-blue-300 text-sm">
+        &copy; {{ new Date().getFullYear() }} Software License Store. All rights
+        reserved.
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { useAuth } from "~/middleware/admin";
-
-const { login, currentUser } = useAuth();
+import { useAuthApi } from "~/composables/api/useAuth";
+import { API_CONFIG_ADMIN } from "~/utils/constants";
+definePageMeta({
+  layout: false,
+});
+const config = useRuntimeConfig();
+const { login, currentUser } = useAuthApi();
 const router = useRouter();
 const route = useRoute();
 
@@ -198,6 +264,12 @@ const form = ref({
   password: "",
   rememberMe: false,
 });
+
+// Password visibility
+const showPassword = ref(false);
+const togglePasswordVisibility = () => {
+  showPassword.value = !showPassword.value;
+};
 
 // Error message
 const errorMessage = ref("");
@@ -219,20 +291,19 @@ const handleLogin = async () => {
   }
 
   isSubmitting.value = true;
-
   try {
-    // Gọi hàm login từ composable
-    const success = login(form.value.email, form.value.password);
+    const result = await login(form.value.email, form.value.password);
 
-    if (success) {
-      // Kiểm tra role và chuyển hướng
-      if (currentUser.value?.role === 'admin') {
-        router.push('/admin');
+    if (result.success) {
+      // Chuyển hướng dựa vào role
+      if (currentUser.value?.role === "admin") {
+        router.push("/admin");
       } else {
-        router.push('/user/dashboard');
+        router.push("/user/dashboard");
       }
     } else {
-      errorMessage.value = "Invalid email/username or password";
+      errorMessage.value =
+        result.message || "Invalid email/username or password";
     }
   } catch (error) {
     console.error("Login error:", error);
@@ -243,13 +314,34 @@ const handleLogin = async () => {
 };
 
 // Demo credentials
-const fillAdminCredentials = () => {
-  form.value.email = "admin@example.com";
-  form.value.password = "admin";
-};
-
-const fillOcrAdminCredentials = () => {
-  form.value.email = "ocr_admin";
-  form.value.password = "123456aA@";
+const loginAsAdmin = () => {
+  const redirect_uri = `${window.location.origin}/auth/callback`;
+  const response_type = "code";
+  const url = `${config.public.apiBaseUrl}/oauth/authorize?client_id=${API_CONFIG_ADMIN.CLIENT_ID}&redirect_uri=${redirect_uri}&response_type=${response_type}&state=${API_CONFIG_ADMIN.STATE}`;
+  window.location.href = url;
 };
 </script>
+
+<style scoped>
+.particle {
+  animation: float linear infinite;
+  opacity: 0.6;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.8;
+  }
+  90% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(-100vh) translateX(100px);
+    opacity: 0;
+  }
+}
+</style>
