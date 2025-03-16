@@ -1,0 +1,164 @@
+/* CKEditor 5 styles */
+
+/* Đảm bảo editor có chiều cao tối thiểu */
+.ck-editor__editable {
+  min-height: 300px;
+  max-height: 600px;
+}
+
+/* Tùy chỉnh giao diện cho dark mode */
+.dark {
+  /* Editor container */
+  .ck.ck-editor__main > .ck-editor__editable {
+    background-color: #1f2937 !important;
+    color: #e5e7eb !important;
+  }
+
+  /* Editor toolbar */
+  .ck.ck-toolbar {
+    background-color: #374151 !important;
+    border-color: #4b5563 !important;
+  }
+
+  /* Buttons */
+  .ck.ck-button {
+    color: #e5e7eb !important;
+    background-color: #374151 !important;
+  }
+
+  .ck.ck-button:hover {
+    background-color: #4b5563 !important;
+  }
+
+  .ck.ck-button.ck-on {
+    background-color: #4b5563 !important;
+    color: #ffffff !important;
+  }
+
+  /* Dropdown panels */
+  .ck.ck-dropdown__panel {
+    background-color: #1f2937 !important;
+    border-color: #4b5563 !important;
+  }
+
+  .ck.ck-list__item {
+    color: #e5e7eb !important;
+  }
+
+  .ck.ck-list__item:hover:not(.ck-disabled) {
+    background-color: #4b5563 !important;
+  }
+
+  /* Content styles */
+  .ck-content {
+    a {
+      color: #60a5fa !important;
+    }
+
+    code {
+      background-color: #374151 !important;
+      color: #e5e7eb !important;
+    }
+
+    blockquote {
+      border-left-color: #4b5563 !important;
+      color: #9ca3af !important;
+    }
+
+    table {
+      border-color: #4b5563 !important;
+    }
+
+    th, td {
+      border-color: #4b5563 !important;
+    }
+  }
+}
+
+/* Tùy chỉnh giao diện chung */
+.ck-content {
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  line-height: 1.5;
+  
+  h1, h2, h3, h4, h5, h6 {
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+  }
+  
+  h1 {
+    font-size: 2em;
+  }
+  
+  h2 {
+    font-size: 1.75em;
+  }
+  
+  h3 {
+    font-size: 1.5em;
+  }
+  
+  h4 {
+    font-size: 1.25em;
+  }
+  
+  p {
+    margin-bottom: 1em;
+  }
+  
+  ul, ol {
+    margin-left: 2em;
+    margin-bottom: 1em;
+  }
+  
+  blockquote {
+    margin-left: 2em;
+    padding-left: 1em;
+    border-left: 4px solid #e5e7eb;
+    font-style: italic;
+  }
+  
+  code {
+    font-family: monospace;
+    background-color: #f3f4f6;
+    padding: 0.2em 0.4em;
+    border-radius: 0.25em;
+  }
+  
+  pre {
+    background-color: #f3f4f6;
+    padding: 1em;
+    border-radius: 0.25em;
+    overflow-x: auto;
+  }
+  
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom: 1em;
+  }
+  
+  th, td {
+    border: 1px solid #d1d5db;
+    padding: 0.5em;
+  }
+  
+  th {
+    background-color: #f3f4f6;
+  }
+  
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  figure {
+    margin: 1em 0;
+    
+    figcaption {
+      font-size: 0.875em;
+      color: #6b7280;
+      text-align: center;
+    }
+  }
+} 

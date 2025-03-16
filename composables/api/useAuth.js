@@ -21,20 +21,30 @@ export const useAuthApi = () => {
   const isAdmin = computed(() => currentUser.value?.role === "admin");
 
   // Login function
-  const login = async (username, password) => {
+  const login = async (username, password, authCodeData = null) => {
     try {
-      const response = await api.post(ENDPOINTS.LOGIN, {
-        grant_type: "password",
-        client_id: API_CONFIG_USER.CLIENT_ID,
-        client_secret: API_CONFIG_USER.CLIENT_SECRET,
-        username,
-        password,
-      });
+      let requestData;
+
+      if (authCodeData) {
+        // Login with authorization code
+        requestData = authCodeData;
+      } else {
+        // Login with password
+        requestData = {
+          grant_type: "password",
+          client_id: API_CONFIG_USER.CLIENT_ID,
+          client_secret: API_CONFIG_USER.CLIENT_SECRET,
+          username,
+          password,
+        };
+      }
+
+      const response = await api.post(ENDPOINTS.LOGIN, requestData);
 
       if (response.access_token) {
         // Save tokens to cookies with proper expiration
         tokenCookie.value = response.access_token;
-        // Set maxAge based on expires_in from response (convert seconds to milliseconds)
+        // Set maxAge based on expires_in from response
         tokenCookie.maxAge = response.expires_in;
         refreshTokenCookie.value = response.refresh_token;
 
@@ -70,8 +80,8 @@ export const useAuthApi = () => {
       const response = await api.get("api/user/me");
 
       if (response.success && response.data) {
-        currentUser.value = response.data;
-        return response.data;
+        currentUser.value = response.data?.user;
+        return currentUser.value;
       }
 
       return null;
