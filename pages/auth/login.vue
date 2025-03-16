@@ -248,13 +248,16 @@
 </template>
 
 <script setup>
-import { useAuthApi } from "~/composables/api/useAuth";
+import { useUserStore } from "~/stores/user";
 import { API_CONFIG_ADMIN } from "~/utils/constants";
+import { ROUTES } from "~/utils/constants";
+
 definePageMeta({
   layout: false,
 });
+
 const config = useRuntimeConfig();
-const { login, currentUser } = useAuthApi();
+const userStore = useUserStore();
 const router = useRouter();
 const route = useRoute();
 
@@ -292,18 +295,20 @@ const handleLogin = async () => {
 
   isSubmitting.value = true;
   try {
-    const result = await login(form.value.email, form.value.password);
+    const result = await userStore.login(form.value.email, form.value.password);
 
     if (result.success) {
       // Chuyển hướng dựa vào role
-      if (currentUser.value?.role === "admin") {
-        router.push("/admin");
+      if (userStore.isAdmin) {
+        router.push(ROUTES.ADMIN_HOME);
+      } else if (userStore.isUser) {
+        router.push(ROUTES.USER_HOME);
       } else {
-        router.push("/user/dashboard");
+        // Nếu không có role cụ thể, chuyển hướng đến trang chủ
+        router.push(ROUTES.HOME);
       }
     } else {
-      errorMessage.value =
-        result.message || "Invalid email/username or password";
+      errorMessage.value = result.error || "Invalid email/username or password";
     }
   } catch (error) {
     console.error("Login error:", error);

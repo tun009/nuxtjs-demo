@@ -1,12 +1,13 @@
 <script setup>
-import { useAuth } from '~/middleware/admin';
+import { useUserStore } from '~/stores/user';
 
 definePageMeta({
   middleware: ['user'],
   layout: 'default'
 });
 
-const { currentUser } = useAuth();
+const userStore = useUserStore();
+const currentUser = computed(() => userStore.user || {});
 
 // Dữ liệu giả cho đơn hàng của user
 const userOrders = ref([

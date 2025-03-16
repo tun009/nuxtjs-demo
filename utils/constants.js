@@ -9,6 +9,7 @@ export const API_CONFIG_ADMIN = {
 };
 export const ENDPOINTS = {
   LOGIN: "/oauth/token",
+  USER_INFO: "/api/user/me",
 };
 
 export const STORAGE_KEYS = {
@@ -16,3 +17,27 @@ export const STORAGE_KEYS = {
   REFRESH_TOKEN: "refresh_token",
   USER_DATA: "user_data",
 };
+
+// Route Constants
+export const ROUTES = {
+  LOGIN: "/auth/login",
+  HOME: "/",
+  ADMIN_HOME: "/admin",
+  USER_HOME: "/user",
+  FORBIDDEN: "/403",
+  NOT_FOUND: "/404",
+};
+
+// Whitelist Routes (không cần đăng nhập)
+export const WHITELIST_ROUTES = [
+  ROUTES.LOGIN,
+  ROUTES.HOME,
+  "/auth/register",
+  "/auth/forgot-password",
+  "/auth/reset-password",
+  "/auth/callback",
+  "/products",
+  "/products/detail",
+  ROUTES.FORBIDDEN,
+  ROUTES.NOT_FOUND,
+];

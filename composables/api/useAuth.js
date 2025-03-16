@@ -1,10 +1,6 @@
 import { useCookie } from "nuxt/app";
 import { useApiService } from "./useApiService";
-import {
-  API_CONFIG_USER,
-  ENDPOINTS,
-  API_CONFIG_ADMIN,
-} from "~/utils/constants";
+import { API_CONFIG_USER, ENDPOINTS } from "~/utils/constants";
 
 export const useAuthApi = () => {
   const api = useApiService();
@@ -38,9 +34,7 @@ export const useAuthApi = () => {
           password,
         };
       }
-
       const response = await api.post(ENDPOINTS.LOGIN, requestData);
-
       if (response.access_token) {
         // Save tokens to cookies with proper expiration
         tokenCookie.value = response.access_token;

@@ -1,11 +1,16 @@
 <script setup>
-import { useAuth } from '~/middleware/admin';
+import { useUserStore } from '~/stores/user';
 
 definePageMeta({
   middleware: ['admin']
 });
 
-const { currentUser, logout } = useAuth();
+const userStore = useUserStore();
+const currentUser = computed(() => userStore.user || {});
+const logout = () => {
+  userStore.logout();
+  router.push('/auth/login');
+};
 const router = useRouter();
 
 // Sidebar state
@@ -38,16 +43,14 @@ const sidebarMenu = [
   }
 ];
 
-// Handle logout
-const handleLogout = () => {
-  logout();
-  router.push('/auth/login');
-};
-
 // User dropdown
 const isUserMenuOpen = ref(false);
+const userMenuRef = ref(null);
 const toggleUserMenu = () => {
   isUserMenuOpen.value = !isUserMenuOpen.value;
+  if (isUserMenuOpen.value) {
+    isNotificationsOpen.value = false;
+  }
 };
 const closeUserMenu = () => {
   isUserMenuOpen.value = false;
@@ -55,11 +58,39 @@ const closeUserMenu = () => {
 
 // Notifications dropdown
 const isNotificationsOpen = ref(false);
+const notificationsRef = ref(null);
 const toggleNotifications = () => {
   isNotificationsOpen.value = !isNotificationsOpen.value;
+  if (isNotificationsOpen.value) {
+    isUserMenuOpen.value = false;
+  }
 };
 const closeNotifications = () => {
   isNotificationsOpen.value = false;
+};
+
+// Xử lý click outside bằng cách sử dụng event listener thông thường
+onMounted(() => {
+  // Thêm event listener cho click outside
+  document.addEventListener('click', handleClickOutside);
+});
+
+onUnmounted(() => {
+  // Loại bỏ event listener khi component bị hủy
+  document.removeEventListener('click', handleClickOutside);
+});
+
+// Hàm xử lý click outside
+const handleClickOutside = (event) => {
+  // Kiểm tra click outside cho user menu
+  if (userMenuRef.value && !userMenuRef.value.contains(event.target) && isUserMenuOpen.value) {
+    closeUserMenu();
+  }
+  
+  // Kiểm tra click outside cho notifications
+  if (notificationsRef.value && !notificationsRef.value.contains(event.target) && isNotificationsOpen.value) {
+    closeNotifications();
+  }
 };
 
 // Mock notifications
@@ -100,16 +131,52 @@ const isDark = computed(() => colorMode.value === 'dark');
 const toggleDarkMode = () => {
   colorMode.preference = isDark.value ? 'light' : 'dark';
 };
+
+// Handle logout
+const handleLogout = () => {
+  logout();
+};
 </script>
 
 <template>
   <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
-    <!-- Sidebar -->
+    <!-- Collapsed Sidebar (Icons only) -->
     <aside 
-      :class="[
-        'fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-800 shadow-lg transform transition-transform duration-300 ease-in-out',
-        isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      ]"
+      v-if="!isSidebarOpen"
+      class="fixed inset-y-0 left-0 z-50 w-16 bg-white dark:bg-gray-800 shadow-lg flex flex-col items-center py-4"
+    >
+      <button 
+        @click="toggleSidebar" 
+        class="p-2 mb-6 rounded-md text-gray-500 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:bg-gray-700"
+      >
+        <Icon name="heroicons:bars-3" class="h-6 w-6" />
+      </button>
+      
+      <div class="flex-1 flex flex-col items-center space-y-4">
+        <NuxtLink 
+          v-for="item in sidebarMenu" 
+          :key="item.name"
+          :to="item.to" 
+          class="p-2 rounded-md text-gray-500 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:bg-gray-700"
+          :title="item.name"
+        >
+          <Icon :name="item.icon" class="h-6 w-6" />
+        </NuxtLink>
+      </div>
+      
+      <button 
+        @click="handleLogout" 
+        class="p-2 mt-6 rounded-md text-gray-500 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:bg-gray-700"
+        title="Logout"
+      >
+        <Icon name="heroicons:arrow-right-on-rectangle" class="h-6 w-6" />
+      </button>
+    </aside>
+    
+    <!-- Full Sidebar -->
+    <aside 
+      v-if="isSidebarOpen"
+      class="fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-800 shadow-lg transform transition-transform duration-300 ease-in-out translate-x-0"
     >
       <!-- Sidebar header -->
       <div class="h-16 flex items-center justify-between px-4 border-b border-gray-200 dark:border-gray-700">
@@ -119,7 +186,7 @@ const toggleDarkMode = () => {
         </NuxtLink>
         <button 
           @click="toggleSidebar" 
-          class="p-1 rounded-md text-gray-500 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:bg-gray-700 lg:hidden"
+          class="p-1 rounded-md text-gray-500 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:bg-gray-700"
         >
           <Icon name="heroicons:x-mark" class="h-6 w-6" />
         </button>
@@ -155,13 +222,14 @@ const toggleDarkMode = () => {
     <!-- Main content -->
     <div :class="[
       'transition-all duration-300 ease-in-out',
-      isSidebarOpen ? 'lg:ml-64' : 'ml-0'
+      isSidebarOpen ? 'lg:ml-64' : 'ml-16'
     ]">
       <!-- Header -->
       <header class="sticky top-0 z-40 h-16 bg-white dark:bg-gray-800 shadow-sm flex items-center px-4 lg:px-6">
         <button 
+          v-if="!isSidebarOpen"
           @click="toggleSidebar" 
-          class="p-1 mr-4 rounded-md text-gray-500 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:bg-gray-700"
+          class="p-1 mr-4 rounded-md text-gray-500 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:bg-gray-700 lg:hidden"
         >
           <Icon name="heroicons:bars-3" class="h-6 w-6" />
         </button>
@@ -179,7 +247,7 @@ const toggleDarkMode = () => {
           </button>
           
           <!-- Notifications -->
-          <div class="relative">
+          <div class="relative" ref="notificationsRef">
             <button 
               @click="toggleNotifications" 
               class="p-1 rounded-md text-gray-500 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:bg-gray-700 relative"
@@ -194,7 +262,6 @@ const toggleDarkMode = () => {
             <div 
               v-if="isNotificationsOpen" 
               class="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-2 z-50 border border-gray-200 dark:border-gray-700"
-              v-click-outside="closeNotifications"
             >
               <div class="flex items-center justify-between px-4 py-2 border-b border-gray-200 dark:border-gray-700">
                 <h3 class="font-medium">Notifications</h3>
@@ -236,7 +303,7 @@ const toggleDarkMode = () => {
           </div>
           
           <!-- User menu -->
-          <div class="relative">
+          <div class="relative" ref="userMenuRef">
             <button 
               @click="toggleUserMenu" 
               class="flex items-center space-x-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
@@ -251,7 +318,6 @@ const toggleDarkMode = () => {
             <div 
               v-if="isUserMenuOpen" 
               class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-2 z-50 border border-gray-200 dark:border-gray-700"
-              v-click-outside="closeUserMenu"
             >
               <div class="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
                 <div class="text-sm font-medium">{{ currentUser?.name || 'Admin' }}</div>

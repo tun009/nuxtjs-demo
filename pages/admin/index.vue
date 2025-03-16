@@ -4,8 +4,9 @@ definePageMeta({
   layout: 'admin'
 });
 
-const { $auth } = useNuxtApp();
-const currentUser = ref($auth.getCurrentUser());
+import { useUserStore } from '~/stores/user';
+const userStore = useUserStore();
+const currentUser = computed(() => userStore.user || {});
 
 // Dữ liệu giả cho thống kê
 const stats = ref({

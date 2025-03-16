@@ -1,5 +1,4 @@
 import axios from "axios";
-import { useAuth } from "~/middleware/admin";
 import { useToast } from "~/composables/useToast";
 const config = useRuntimeConfig();
 const apiBaseUrl = config.public.apiBaseUrl;

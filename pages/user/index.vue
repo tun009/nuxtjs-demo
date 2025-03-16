@@ -1,10 +1,11 @@
 <script setup lang="ts">
 definePageMeta({
-  middleware: ['auth']
+  middleware: ['user']
 });
 
-const { $auth } = useNuxtApp();
-const currentUser = ref($auth.getCurrentUser());
+import { useUserStore } from '~/stores/user';
+const userStore = useUserStore();
+const currentUser = computed(() => userStore.user || {});
 
 // Dữ liệu giả cho đơn hàng
 const orders = ref([
@@ -33,17 +34,22 @@ const licenses = ref([
 ]);
 
 // Hiển thị/ẩn key
-const showKey = ref({});
+const showKey = ref<Record<string, boolean>>({});
 
 // Hàm để chuyển đổi hiển thị key
-const toggleShowKey = (id) => {
+const toggleShowKey = (id: string) => {
   showKey.value[id] = !showKey.value[id];
 };
 
 // Hàm để sao chép key
-const copyKey = (key) => {
+const copyKey = (key: string) => {
   navigator.clipboard.writeText(key);
   // Trong thực tế, bạn có thể hiển thị thông báo thành công
+};
+
+// Hàm đăng xuất
+const logout = () => {
+  userStore.logout();
 };
 </script>
 
@@ -68,7 +74,7 @@ const copyKey = (key) => {
             <button class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition">
               Edit Profile
             </button>
-            <button class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition" @click="$auth.logout()">
+            <button class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition" @click="logout">
               Logout
             </button>
           </div>
