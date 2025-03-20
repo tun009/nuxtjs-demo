@@ -11,7 +11,7 @@ export default defineNuxtConfig({
   ],
   devServer: {
     port: 8080,
-    // host: '0.0.0.0'
+    host: '0.0.0.0'
   },
   i18n: {
     defaultLocale: 'en',
@@ -90,9 +90,17 @@ export default defineNuxtConfig({
       },
     ],
   },
+
+  // Thêm cấu hình cho CKEditor 5
+  build: {
+    transpile: ['@ckeditor/ckeditor5-vue', '@ckeditor/ckeditor5-build-classic'],
+  },
   
-  // Cấu hình vite
+  // Cấu hình vite để xử lý CKEditor 5
   vite: {
+    optimizeDeps: {
+      include: ['@ckeditor/ckeditor5-vue', '@ckeditor/ckeditor5-build-classic'],
+    },
     css: {
       preprocessorOptions: {
         scss: {

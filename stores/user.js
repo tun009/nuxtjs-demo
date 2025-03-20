@@ -92,8 +92,8 @@ export const useUserStore = defineStore("user", () => {
         console.log("Using password flow");
         loginData = {
           grant_type: "password",
-          client_id: $apiConfig.API_CONFIG_USER.CLIENT_ID,
-          client_secret: $apiConfig.API_CONFIG_USER.CLIENT_SECRET,
+          client_id: API_CONFIG_USER.CLIENT_ID,
+          client_secret: API_CONFIG_USER.CLIENT_SECRET,
           username,
           password,
         };
@@ -188,8 +188,8 @@ export const useUserStore = defineStore("user", () => {
       // Chuẩn bị dữ liệu refresh token
       const refreshData = {
         grant_type: "refresh_token",
-        client_id: $apiConfig.API_CONFIG_USER.CLIENT_ID,
-        client_secret: $apiConfig.API_CONFIG_USER.CLIENT_SECRET,
+        client_id: API_CONFIG_USER.CLIENT_ID,
+        client_secret: API_CONFIG_USER.CLIENT_SECRET,
         refresh_token: refreshTokenValue,
       };
 
