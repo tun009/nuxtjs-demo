@@ -9,7 +9,8 @@
     "logout": "Đăng xuất",
     "search": "Tìm kiếm",
     "darkMode": "Chế độ tối",
-    "language": "Ngôn ngữ"
+    "language": "Ngôn ngữ",
+    "learnMore": "Tìm hiểu thêm"
   },
   "product": {
     "buy": "Mua ngay",
@@ -64,10 +65,61 @@
     "unavailable": "Tạm hết hàng",
     "reviews": "Đánh giá",
     "learnMore": "Tìm hiểu thêm",
+    "title": "Sản phẩm",
+    "subtitle": "Khám phá sản phẩm của chúng tôi",
     "notFound": {
       "title": "Không tìm thấy sản phẩm",
       "description": "Sản phẩm bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.",
       "browseProducts": "Xem các sản phẩm khác"
     }
+  },
+  "checkout": {
+    "title": "Thanh toán",
+    "subtitle": "Hoàn tất đơn hàng của bạn",
+    "orderSummary": "Tóm tắt đơn hàng",
+    "loading": "Đang tải thông tin đơn hàng...",
+    "officialProduct": "Sản phẩm chính hãng",
+    "paymentMethod": "Phương thức thanh toán",
+    "creditCard": "Thẻ tín dụng",
+    "bankTransfer": "Chuyển khoản ngân hàng",
+    "orderTotal": "Tổng đơn hàng",
+    "subtotal": "Tạm tính",
+    "vat": "Thuế VAT",
+    "total": "Thành tiền",
+    "placeOrder": "Đặt hàng",
+    "processing": "Đang xử lý...",
+    "secureCheckout": "Thanh toán an toàn",
+    "tryAgain": "Thử lại"
+  },
+  "order": {
+    "confirmationTitle": "Đơn hàng đã xác nhận",
+    "confirmationMessage": "Cảm ơn bạn đã mua hàng! Đơn hàng của bạn đã được đặt thành công.",
+    "orderDetails": "Chi tiết đơn hàng",
+    "orderNumber": "Mã đơn hàng",
+    "date": "Ngày đặt",
+    "paymentMethod": "Phương thức thanh toán",
+    "totalAmount": "Tổng thanh toán",
+    "viewDashboard": "Xem bảng điều khiển",
+    "continueShopping": "Tiếp tục mua sắm",
+    "loadingOrderDetails": "Đang tải chi tiết đơn hàng...",
+    "errorTitle": "Lỗi khi tải đơn hàng",
+    "tryAgain": "Thử lại",
+    "backToProducts": "Quay lại trang sản phẩm"
+  },
+  "user": {
+    "profile": "Hồ sơ",
+    "myOrders": "Đơn hàng của tôi",
+    "myLicenses": "Giấy phép của tôi",
+    "accountSettings": "Cài đặt tài khoản",
+    "billingInfo": "Thông tin thanh toán",
+    "signOut": "Đăng xuất",
+    "dashboard": "Bảng điều khiển"
+  },
+  "error": {
+    "general": "Đã xảy ra lỗi",
+    "notFound": "Không tìm thấy trang",
+    "serverError": "Lỗi máy chủ",
+    "unauthorized": "Không có quyền truy cập",
+    "forbidden": "Truy cập bị cấm"
   }
 } 
