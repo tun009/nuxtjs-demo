@@ -147,11 +147,11 @@ const handleLogout = () => {
 </script>
 
 <template>
-  <div class="h-screen bg-gray-100 dark:bg-gray-900 overflow-hidden">
+  <div class="h-screen bg-gray-100 dark:bg-gray-900 flex overflow-hidden">
     <!-- Collapsed Sidebar (Icons only) -->
     <aside
       v-if="!isSidebarOpen"
-      class="fixed inset-y-0 left-0 z-50 w-16 bg-white dark:bg-gray-800 shadow-lg flex flex-col items-center py-4"
+      class="fixed lg:relative inset-y-0 left-0 z-50 w-16 bg-white dark:bg-gray-800 shadow-lg flex flex-col items-center py-4"
     >
       <button
         @click="toggleSidebar"
@@ -184,7 +184,7 @@ const handleLogout = () => {
     <!-- Full Sidebar -->
     <aside
       v-if="isSidebarOpen"
-      class="fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-800 shadow-lg transform transition-transform duration-300 ease-in-out translate-x-0"
+      class="inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-800 shadow-lg transform transition-transform duration-300 ease-in-out"
     >
       <!-- Sidebar header -->
       <div
@@ -236,15 +236,10 @@ const handleLogout = () => {
     </aside>
 
     <!-- Main content -->
-    <div
-      :class="[
-        'transition-all duration-300 ease-in-out',
-        isSidebarOpen ? 'lg:ml-64' : 'ml-16',
-      ]"
-    >
+    <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
       <!-- Header -->
       <header
-        class="sticky top-0 z-40 h-16 bg-white dark:bg-gray-800 shadow-sm flex items-center px-4 lg:px-6"
+        class="sticky top-0 z-40 h-16 bg-white dark:bg-gray-800 shadow-sm flex items-center px-4 lg:px-6 min-w-0"
       >
         <button
           v-if="!isSidebarOpen"
@@ -401,7 +396,7 @@ const handleLogout = () => {
       </header>
 
       <!-- Page content -->
-      <main class="p-4 lg:p-6 h-main">
+      <main class="flex-1 overflow-auto p-4 lg:p-6">
         <slot />
       </main>
     </div>

@@ -1,11 +1,11 @@
 <script setup>
-import PageHeader from '~/components/common/PageHeader.vue';
-import SearchBar from '~/components/common/SearchBar.vue';
-import ErrorDisplay from '~/components/common/ErrorDisplay.vue';
+import PageHeader from "~/components/common/PageHeader.vue";
+import SearchBar from "~/components/common/SearchBar.vue";
+import ErrorDisplay from "~/components/common/ErrorDisplay.vue";
 
 /**
  * Component ListPage có thể tái sử dụng
- * 
+ *
  * Props:
  * - title: Tiêu đề trang
  * - actionText: Text cho nút hành động
@@ -17,7 +17,7 @@ import ErrorDisplay from '~/components/common/ErrorDisplay.vue';
  * - searchValue: Giá trị tìm kiếm
  * - searchPlaceholder: Placeholder cho ô tìm kiếm
  * - showSearch: Có hiển thị ô tìm kiếm không
- * 
+ *
  * Events:
  * - update:searchValue: Khi giá trị tìm kiếm thay đổi
  * - search: Khi người dùng tìm kiếm
@@ -29,77 +29,77 @@ const props = defineProps({
   // Tiêu đề trang
   title: {
     type: String,
-    required: true
+    required: true,
   },
   // Text cho nút hành động
   actionText: {
     type: String,
-    default: ''
+    default: "",
   },
   // Icon cho nút hành động
   actionIcon: {
     type: String,
-    default: ''
+    default: "",
   },
   // Route cho nút hành động
   actionRoute: {
     type: String,
-    default: ''
+    default: "",
   },
   // Có hiển thị nút hành động không
   showAction: {
     type: Boolean,
-    default: true
+    default: true,
   },
   // Thông báo lỗi (nếu có)
   error: {
     type: String,
-    default: ''
+    default: "",
   },
   // Trạng thái đang tải dữ liệu
   loading: {
     type: Boolean,
-    default: false
+    default: false,
   },
   // Giá trị tìm kiếm
   searchValue: {
     type: String,
-    default: ''
+    default: "",
   },
   // Placeholder cho ô tìm kiếm
   searchPlaceholder: {
     type: String,
-    default: 'Search...'
+    default: "Search...",
   },
   // Có hiển thị ô tìm kiếm không
   showSearch: {
     type: Boolean,
-    default: true
-  }
+    default: true,
+  },
 });
 
 // Emit events
-const emit = defineEmits(['update:searchValue', 'search', 'retry', 'action']);
+const emit = defineEmits(["update:searchValue", "search", "retry", "action"]);
 
 // Xử lý tìm kiếm
 const handleSearch = (value) => {
-  emit('search', value);
+  emit("search", value);
 };
 
 // Xử lý thử lại
 const handleRetry = () => {
-  emit('retry');
+  emit("retry");
 };
 
 // Xử lý hành động
 const handleAction = () => {
-  emit('action');
+  emit("action");
 };
 
 // Giá trị tìm kiếm
 const searchValueModel = computed({
   get: () => props.searchValue,
-  set: (value) => emit('update:searchValue', value)
+  set: (value) => emit("update:searchValue", value),
 });
 </script>
 
@@ -114,7 +114,7 @@ const searchValueModel = computed({
       :show-action="showAction"
       @action="handleAction"
     />
-    
+
     <!-- Search -->
     <SearchBar
       v-if="showSearch"
@@ -124,7 +124,7 @@ const searchValueModel = computed({
       @search="handleSearch"
       class="mb-6"
     />
-    
+
     <!-- Error state -->
     <ErrorDisplay
       v-if="error"
@@ -132,12 +132,15 @@ const searchValueModel = computed({
       retry-text="Try Again"
       @retry="handleRetry"
     />
-    
+
     <!-- Content -->
-    <div v-else class="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden flex-1 flex flex-col">
+    <div
+      v-else
+      class="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden flex-1 flex flex-col"
+    >
       <!-- Slot for content -->
       <slot></slot>
-      
+
       <!-- Slot for pagination -->
       <slot name="pagination"></slot>
     </div>
@@ -146,6 +149,6 @@ const searchValueModel = computed({
 
 <style scoped>
 .h-full {
-  height: calc(100vh - 180px); /* Điều chỉnh chiều cao để phù hợp với layout */
+  height: calc(100vh - 120px); /* Điều chỉnh chiều cao để phù hợp với layout */
 }
-</style> 
+</style>

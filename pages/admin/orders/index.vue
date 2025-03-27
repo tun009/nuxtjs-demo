@@ -1,483 +1,492 @@
 <script setup>
 definePageMeta({
-  middleware: ['admin'],
-  layout: 'admin'
+  middleware: ["admin"],
+  layout: "admin",
 });
 
-// Dữ liệu giả cho đơn hàng
-const orders = ref([
-  { 
-    id: 'ORD-1001', 
-    user: { id: 1, name: 'John Doe', email: 'john@example.com' }, 
-    product: { id: 1, name: 'Product 1' }, 
-    package: 'Professional', 
-    amount: 99, 
-    date: '2024-06-15', 
-    status: 'Completed',
-    paymentMethod: 'Credit Card'
-  },
-  { 
-    id: 'ORD-1002', 
-    user: { id: 2, name: 'Jane Smith', email: 'jane@example.com' }, 
-    product: { id: 2, name: 'Product 2' }, 
-    package: 'Basic', 
-    amount: 49, 
-    date: '2024-06-10', 
-    status: 'Completed',
-    paymentMethod: 'PayPal'
-  },
-  { 
-    id: 'ORD-1003', 
-    user: { id: 3, name: 'Robert Johnson', email: 'robert@example.com' }, 
-    product: { id: 3, name: 'Product 3' }, 
-    package: 'Enterprise', 
-    amount: 199, 
-    date: '2024-06-05', 
-    status: 'Completed',
-    paymentMethod: 'Bank Transfer'
-  },
-  { 
-    id: 'ORD-1004', 
-    user: { id: 4, name: 'Emily Davis', email: 'emily@example.com' }, 
-    product: { id: 1, name: 'Product 1' }, 
-    package: 'Professional', 
-    amount: 99, 
-    date: '2024-05-28', 
-    status: 'Completed',
-    paymentMethod: 'Credit Card'
-  },
-  { 
-    id: 'ORD-1005', 
-    user: { id: 5, name: 'Michael Brown', email: 'michael@example.com' }, 
-    product: { id: 2, name: 'Product 2' }, 
-    package: 'Basic', 
-    amount: 49, 
-    date: '2024-05-20', 
-    status: 'Completed',
-    paymentMethod: 'PayPal'
-  },
-  { 
-    id: 'ORD-1006', 
-    user: { id: 6, name: 'Sarah Wilson', email: 'sarah@example.com' }, 
-    product: { id: 3, name: 'Product 3' }, 
-    package: 'Enterprise', 
-    amount: 199, 
-    date: '2024-05-15', 
-    status: 'Pending',
-    paymentMethod: 'Bank Transfer'
-  },
-  { 
-    id: 'ORD-1007', 
-    user: { id: 7, name: 'David Miller', email: 'david@example.com' }, 
-    product: { id: 1, name: 'Product 1' }, 
-    package: 'Basic', 
-    amount: 49, 
-    date: '2024-05-10', 
-    status: 'Failed',
-    paymentMethod: 'Credit Card'
-  },
-  { 
-    id: 'ORD-1008', 
-    user: { id: 8, name: 'Jennifer Taylor', email: 'jennifer@example.com' }, 
-    product: { id: 2, name: 'Product 2' }, 
-    package: 'Professional', 
-    amount: 99, 
-    date: '2024-05-05', 
-    status: 'Refunded',
-    paymentMethod: 'PayPal'
-  }
-]);
+// Import components
+import DataTable from "~/components/common/DataTable.vue";
+import Pagination from "~/components/common/Pagination.vue";
+import { formatDate } from "~/utils/common";
+// Import notification utilities
+import {
+  confirm,
+  notifySuccess,
+  notifyError,
+  notifyInfo,
+} from "~/utils/notification";
+// API integration
+const { $api } = useNuxtApp();
+const router = useRouter();
+const route = useRoute();
 
-// Tìm kiếm đơn hàng
-const searchQuery = ref('');
-const filteredOrders = computed(() => {
-  if (!searchQuery.value) return orders.value;
-  const query = searchQuery.value.toLowerCase();
-  return orders.value.filter(order => 
-    order.id.toLowerCase().includes(query) || 
-    order.user.name.toLowerCase().includes(query) || 
-    order.user.email.toLowerCase().includes(query) ||
-    order.product.name.toLowerCase().includes(query)
-  );
+// State
+const loading = ref(true);
+const error = ref(null);
+const orders = ref([]);
+const pagination = ref({
+  current_page: 1,
+  per_page: 10,
+  total: 0,
+  last_page: 1,
 });
 
-// Lọc theo trạng thái
-const statusFilter = ref('all');
-const statusFilteredOrders = computed(() => {
-  if (statusFilter.value === 'all') return filteredOrders.value;
-  return filteredOrders.value.filter(order => order.status.toLowerCase() === statusFilter.value.toLowerCase());
-});
+// Search and filter parameters
+const searchQuery = ref("");
+const currentPage = ref(1);
+const perPage = ref(10);
+const sortBy = ref("created_at");
+const sortDirection = ref("desc");
 
-// Sắp xếp
-const sortBy = ref('date');
-const sortDirection = ref('desc');
+// DataTable columns configuration
+const columns = [
+  {
+    key: "index",
+    label: "Order",
+    sortable: false,
+    width: "60px",
+  },
+  {
+    key: "order_code",
+    label: "Order Code",
+    sortable: true,
+    width: "180px",
+  },
+  {
+    key: "price",
+    label: "Price",
+    sortable: true,
+    width: "130px",
+    align: "right",
+  },
+  {
+    key: "limit_devices",
+    label: "Device Limit",
+    sortable: true,
+    width: "120px",
+    align: "center",
+  },
+  {
+    key: "status",
+    label: "Status",
+    sortable: false,
+    width: "120px",
+    align: "center",
+  },
+  {
+    key: "created_at",
+    label: "Created",
+    sortable: false,
+    width: "170px",
+  },
+];
 
-const sortedOrders = computed(() => {
-  const orders = [...statusFilteredOrders.value];
-  
-  orders.sort((a, b) => {
-    let comparison = 0;
-    
-    if (sortBy.value === 'date') {
-      comparison = new Date(a.date) - new Date(b.date);
-    } else if (sortBy.value === 'amount') {
-      comparison = a.amount - b.amount;
-    } else if (sortBy.value === 'id') {
-      comparison = a.id.localeCompare(b.id);
-    } else if (sortBy.value === 'customer') {
-      comparison = a.user.name.localeCompare(b.user.name);
+// DataTable actions configuration
+const actions = [
+  {
+    key: "view",
+    icon: "heroicons:eye",
+    label: "View Order",
+    color:
+      "text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300",
+  },
+  {
+    key: "invoice",
+    icon: "heroicons:document-text",
+    label: "Download Invoice",
+    color:
+      "text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300",
+  },
+  {
+    key: "resend",
+    icon: "heroicons:envelope",
+    label: "Resend Email",
+    color:
+      "text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300",
+  },
+  {
+    key: "delete",
+    icon: "heroicons:trash",
+    label: "Delete Order",
+    color:
+      "text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300",
+  },
+];
+
+// Fetch orders from API
+const fetchOrders = async () => {
+  loading.value = true;
+  error.value = null;
+
+  try {
+    console.log("Fetching orders...");
+    const response = await $api.get("api/orders", {
+      params: {
+        page: currentPage.value,
+        per_page: perPage.value,
+        search: searchQuery.value || undefined,
+        sort_by: sortBy.value,
+        sort_direction: sortDirection.value,
+      },
+    });
+
+    console.log("API response:", response);
+
+    if (response.success) {
+      orders.value = response.data.data;
+
+      // Update pagination info
+      pagination.value = {
+        current_page: response.data.current_page,
+        per_page: response.data.per_page,
+        total: response.data.total,
+        last_page: response.data.last_page,
+      };
+    } else {
+      error.value = response.message || "Failed to fetch orders";
     }
-    
-    return sortDirection.value === 'asc' ? comparison : -comparison;
-  });
-  
-  return orders;
-});
+  } catch (err) {
+    console.error("Error fetching orders:", err);
+    error.value = err.message || "An error occurred while fetching orders";
+  } finally {
+    loading.value = false;
+  }
+};
 
-// Thay đổi sắp xếp
-const changeSort = (column) => {
+// Handle search
+const handleSearch = (query) => {
+  searchQuery.value = query;
+  currentPage.value = 1;
+  fetchOrders();
+};
+
+// Handle pagination
+const handlePageChange = (page) => {
+  currentPage.value = page;
+  fetchOrders();
+};
+
+// Handle per page change
+const handlePerPageChange = (value) => {
+  perPage.value = value;
+  currentPage.value = 1;
+  fetchOrders();
+};
+
+// Handle sorting
+const handleSort = (column) => {
   if (sortBy.value === column) {
-    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
+    sortDirection.value = sortDirection.value === "asc" ? "desc" : "asc";
   } else {
     sortBy.value = column;
-    sortDirection.value = 'desc';
+    sortDirection.value = "asc";
+  }
+  fetchOrders();
+};
+
+// Handle actions
+const handleAction = ({ action, item }) => {
+  switch (action) {
+    case "view":
+      router.push(`/admin/orders/${item.id}`);
+      break;
+    case "invoice":
+      downloadInvoice(item.id);
+      break;
+    case "resend":
+      resendOrderConfirmation(item.id);
+      break;
+    case "delete":
+      console.log("Delete order:", item);
+      confirmDeleteOrder(item);
+      break;
   }
 };
 
-// Phân trang
-const currentPage = ref(1);
-const itemsPerPage = ref(5);
-
-const paginatedOrders = computed(() => {
-  const startIndex = (currentPage.value - 1) * itemsPerPage.value;
-  const endIndex = startIndex + itemsPerPage.value;
-  return sortedOrders.value.slice(startIndex, endIndex);
-});
-
-const totalPages = computed(() => {
-  return Math.ceil(sortedOrders.value.length / itemsPerPage.value);
-});
-
-const pageNumbers = computed(() => {
-  const pages = [];
-  for (let i = 1; i <= totalPages.value; i++) {
-    pages.push(i);
-  }
-  return pages;
-});
-
-// Chuyển trang
-const goToPage = (page) => {
-  currentPage.value = page;
+// Download invoice
+const downloadInvoice = (orderId) => {
+  // Implement invoice download logic
+  notifyInfo(`Downloading invoice for order #${orderId}`);
 };
 
-// Xóa đơn hàng
-const deleteOrder = (id) => {
-  if (confirm('Are you sure you want to delete this order?')) {
-    orders.value = orders.value.filter(order => order.id !== id);
+// Resend order confirmation
+const resendOrderConfirmation = async (orderId) => {
+  try {
+    const response = await $api.post(
+      `api/orders/${orderId}/resend-confirmation`
+    );
+    if (response.success) {
+      notifySuccess("Order confirmation email has been resent");
+    } else {
+      notifyError(response.message || "Failed to resend confirmation email");
+    }
+  } catch (err) {
+    console.error("Error resending confirmation:", err);
+    notifyError(
+      err.message || "An error occurred while resending the confirmation email"
+    );
   }
 };
 
-// Thống kê
-const statistics = computed(() => {
-  const total = orders.value.length;
-  const completed = orders.value.filter(order => order.status === 'Completed').length;
-  const pending = orders.value.filter(order => order.status === 'Pending').length;
-  const failed = orders.value.filter(order => order.status === 'Failed').length;
-  const refunded = orders.value.filter(order => order.status === 'Refunded').length;
-  
-  const totalRevenue = orders.value
-    .filter(order => order.status === 'Completed')
-    .reduce((sum, order) => sum + order.amount, 0);
-  
-  return {
-    total,
-    completed,
-    pending,
-    failed,
-    refunded,
-    totalRevenue
+// Delete order confirmation
+const confirmDeleteOrder = (order) => {
+  console.log("confirmDeleteOrder");
+  confirm(
+    `Are you sure you want to delete order #${order.order_code}? This action cannot be undone.`,
+    "Confirm Delete",
+    {
+      confirmButtonText: "Delete",
+      cancelButtonText: "Cancel",
+      type: "warning",
+    }
+  )
+    .then(() => {
+      deleteOrder(order.id);
+    })
+    .catch(() => {
+      // Cancelled by user
+    });
+};
+
+// Delete order
+const deleteOrder = async (orderId) => {
+  try {
+    const response = await $api.delete(`api/orders/${orderId}`);
+    if (response.success) {
+      notifySuccess("Order has been deleted successfully");
+      // Refresh the orders list
+      fetchOrders();
+    } else {
+      notifyError(response.message || "Failed to delete order");
+    }
+  } catch (err) {
+    console.error("Error deleting order:", err);
+    notifyError(err.message || "An error occurred while deleting the order");
+  }
+};
+const changePerPage = (value) => {
+  perPage.value = value;
+  currentPage.value = 1; // Reset về trang đầu tiên
+  fetchOrders();
+};
+// Fetch orders on component mount
+onMounted(() => {
+  // Initialize from URL query params
+  if (route.query.search) {
+    searchQuery.value = route.query.search;
+  }
+  if (route.query.page) {
+    currentPage.value = parseInt(route.query.page);
+  }
+  if (route.query.per_page) {
+    perPage.value = parseInt(route.query.per_page);
+  }
+  if (route.query.sort_by) {
+    sortBy.value = route.query.sort_by;
+  }
+  if (route.query.sort_direction) {
+    sortDirection.value = route.query.sort_direction;
+  }
+
+  fetchOrders();
+});
+
+// Watch for search query changes to update URL
+watch(
+  [searchQuery, currentPage, perPage, sortBy, sortDirection],
+  () => {
+    // Update URL with search params without refreshing the page
+    router.push({
+      query: {
+        search: searchQuery.value || undefined,
+        page: currentPage.value !== 1 ? currentPage.value : undefined,
+        per_page: perPage.value !== 10 ? perPage.value : undefined,
+        sort_by: sortBy.value !== "created_at" ? sortBy.value : undefined,
+        sort_direction:
+          sortDirection.value !== "desc" ? sortDirection.value : undefined,
+      },
+    });
+  },
+  { deep: true }
+);
+
+// Status color mapping
+const getStatusInfo = (status) => {
+  const statusMap = {
+    active: {
+      text: "Active",
+      class:
+        "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400 border border-green-400/20",
+    },
+    pending: {
+      text: "Pending",
+      class:
+        "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400 border border-yellow-400/20",
+    },
+    failed: {
+      text: "Failed",
+      class:
+        "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400 border border-red-400/20",
+    },
+    cancelled: {
+      text: "Cancelled",
+      class:
+        "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400 border border-red-400/20",
+    },
+    refunded: {
+      text: "Refunded",
+      class:
+        "bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400 border border-purple-400/20",
+    },
+    paid: {
+      text: "Paid",
+      class:
+        "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400 border border-blue-400/20",
+    },
   };
-});
 
-// Định dạng tiền tệ
-const formatCurrency = (amount) => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD'
-  }).format(amount);
+  status = status?.toLowerCase() || "unknown";
+  return (
+    statusMap[status] || {
+      text: "Unknown",
+      class:
+        "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400 border border-gray-400/20",
+    }
+  );
 };
 
-// Định dạng ngày
-const formatDate = (dateString) => {
-  const options = { year: 'numeric', month: 'short', day: 'numeric' };
-  return new Date(dateString).toLocaleDateString('en-US', options);
+// Coppy order code
+const copyOrderCode = (code) => {
+  navigator.clipboard
+    .writeText(code)
+    .then(() => {
+      notifySuccess("Order code copied to clipboard!", "Copied");
+    })
+    .catch((err) => {
+      console.error("Failed to copy: ", err);
+      notifyError("Failed to copy order code");
+    });
+};
+
+// Debounce function for search
+const debounce = (fn, time) => {
+  let timeout;
+  return function () {
+    const args = arguments;
+    const context = this;
+    if (timeout) clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      fn.apply(context, args);
+    }, time);
+  };
 };
 </script>
 
 <template>
-  <div>
+  <div class="p-6 pt-0">
     <div class="flex justify-between items-center mb-6">
       <h1 class="text-2xl font-bold">Orders</h1>
     </div>
-    
-    <!-- Statistics -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
-        <div class="flex items-center">
-          <div class="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-600 dark:text-blue-300 mr-4">
-            <Icon name="heroicons:shopping-cart" class="h-6 w-6" />
-          </div>
-          <div>
-            <div class="text-sm text-gray-500 dark:text-gray-400">Total Orders</div>
-            <div class="text-2xl font-bold">{{ statistics.total }}</div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
-        <div class="flex items-center">
-          <div class="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center text-green-600 dark:text-green-300 mr-4">
-            <Icon name="heroicons:check-circle" class="h-6 w-6" />
-          </div>
-          <div>
-            <div class="text-sm text-gray-500 dark:text-gray-400">Completed</div>
-            <div class="text-2xl font-bold">{{ statistics.completed }}</div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
-        <div class="flex items-center">
-          <div class="w-12 h-12 rounded-full bg-yellow-100 dark:bg-yellow-900 flex items-center justify-center text-yellow-600 dark:text-yellow-300 mr-4">
-            <Icon name="heroicons:clock" class="h-6 w-6" />
-          </div>
-          <div>
-            <div class="text-sm text-gray-500 dark:text-gray-400">Pending</div>
-            <div class="text-2xl font-bold">{{ statistics.pending }}</div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
-        <div class="flex items-center">
-          <div class="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900 flex items-center justify-center text-red-600 dark:text-red-300 mr-4">
-            <Icon name="heroicons:x-circle" class="h-6 w-6" />
-          </div>
-          <div>
-            <div class="text-sm text-gray-500 dark:text-gray-400">Failed/Refunded</div>
-            <div class="text-2xl font-bold">{{ statistics.failed + statistics.refunded }}</div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
-        <div class="flex items-center">
-          <div class="w-12 h-12 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center text-purple-600 dark:text-purple-300 mr-4">
-            <Icon name="heroicons:currency-dollar" class="h-6 w-6" />
-          </div>
-          <div>
-            <div class="text-sm text-gray-500 dark:text-gray-400">Revenue</div>
-            <div class="text-2xl font-bold">{{ formatCurrency(statistics.totalRevenue) }}</div>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Search and filters -->
-    <div class="bg-white dark:bg-gray-800 rounded-lg p-4 mb-6 shadow-sm">
-      <div class="flex flex-col md:flex-row gap-4">
-        <div class="flex-1">
-          <div class="relative">
-            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-              <Icon name="heroicons:magnifying-glass" class="w-5 h-5 text-gray-400" />
-            </div>
-            <input 
-              v-model="searchQuery"
-              type="text" 
-              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" 
-              placeholder="Search orders by ID, customer, or product..." 
+
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-6">
+      <div class="flex items-center w-full gap-4">
+        <!-- Search box -->
+        <div class="relative w-full md:w-80 flex-1">
+          <input
+            v-model="searchQuery"
+            @input="debounce(() => handleSearch(searchQuery), 500)"
+            type="text"
+            placeholder="Search Orders..."
+            class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 pl-10"
+          />
+          <div
+            class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"
+          >
+            <Icon
+              name="heroicons:magnifying-glass"
+              class="h-5 w-5 text-gray-500 dark:text-gray-400"
             />
           </div>
         </div>
-        <div class="flex gap-2">
-          <select 
-            v-model="statusFilter" 
-            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-          >
-            <option value="all">All Statuses</option>
-            <option value="completed">Completed</option>
-            <option value="pending">Pending</option>
-            <option value="failed">Failed</option>
-            <option value="refunded">Refunded</option>
-          </select>
-          
-          <select 
-            v-model="itemsPerPage" 
-            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-          >
-            <option :value="5">5 per page</option>
-            <option :value="10">10 per page</option>
-            <option :value="20">20 per page</option>
-            <option :value="50">50 per page</option>
-          </select>
-        </div>
+        <button
+          @click="handleSearch"
+          class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center"
+        >
+          <Icon name="heroicons:magnifying-glass" class="h-5 w-5 mr-2" />
+          Search
+        </button>
       </div>
     </div>
-    
-    <!-- Orders table -->
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
-      <div class="overflow-x-auto">
-        <table class="w-full text-left">
-          <thead class="bg-gray-50 dark:bg-gray-700">
-            <tr>
-              <th 
-                @click="changeSort('id')" 
-                class="px-6 py-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer"
-              >
-                <div class="flex items-center">
-                  Order ID
-                  <Icon 
-                    v-if="sortBy === 'id'" 
-                    :name="sortDirection === 'asc' ? 'heroicons:chevron-up' : 'heroicons:chevron-down'" 
-                    class="h-4 w-4 ml-1" 
-                  />
-                </div>
-              </th>
-              <th 
-                @click="changeSort('customer')" 
-                class="px-6 py-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer"
-              >
-                <div class="flex items-center">
-                  Customer
-                  <Icon 
-                    v-if="sortBy === 'customer'" 
-                    :name="sortDirection === 'asc' ? 'heroicons:chevron-up' : 'heroicons:chevron-down'" 
-                    class="h-4 w-4 ml-1" 
-                  />
-                </div>
-              </th>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Product</th>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Package</th>
-              <th 
-                @click="changeSort('amount')" 
-                class="px-6 py-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer"
-              >
-                <div class="flex items-center">
-                  Amount
-                  <Icon 
-                    v-if="sortBy === 'amount'" 
-                    :name="sortDirection === 'asc' ? 'heroicons:chevron-up' : 'heroicons:chevron-down'" 
-                    class="h-4 w-4 ml-1" 
-                  />
-                </div>
-              </th>
-              <th 
-                @click="changeSort('date')" 
-                class="px-6 py-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer"
-              >
-                <div class="flex items-center">
-                  Date
-                  <Icon 
-                    v-if="sortBy === 'date'" 
-                    :name="sortDirection === 'asc' ? 'heroicons:chevron-up' : 'heroicons:chevron-down'" 
-                    class="h-4 w-4 ml-1" 
-                  />
-                </div>
-              </th>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
-              <th class="px-6 py-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-            <tr v-for="order in paginatedOrders" :key="order.id" class="hover:bg-gray-50 dark:hover:bg-gray-700">
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">{{ order.id }}</td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm font-medium text-gray-900 dark:text-white">{{ order.user.name }}</div>
-                <div class="text-sm text-gray-500 dark:text-gray-400">{{ order.user.email }}</div>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ order.product.name }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ order.package }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ formatCurrency(order.amount) }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ formatDate(order.date) }}</td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <span 
-                  :class="[
-                    'px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full',
-                    order.status === 'Completed' ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400' :
-                    order.status === 'Pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400' :
-                    order.status === 'Failed' ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400' :
-                    'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'
-                  ]"
-                >
-                  {{ order.status }}
-                </span>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                <div class="flex space-x-2">
-                  <NuxtLink :to="`/admin/orders/${order.id}`" class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
-                    <Icon name="heroicons:eye" class="h-5 w-5" />
-                  </NuxtLink>
-                  <button @click="deleteOrder(order.id)" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
-                    <Icon name="heroicons:trash" class="h-5 w-5" />
-                  </button>
-                </div>
-              </td>
-            </tr>
-            <tr v-if="paginatedOrders.length === 0">
-              <td colspan="8" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
-                No orders found. Try a different search term or filter.
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      
-      <!-- Pagination -->
-      <div class="bg-white dark:bg-gray-800 px-4 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 sm:px-6">
-        <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-          <div>
-            <p class="text-sm text-gray-700 dark:text-gray-300">
-              Showing <span class="font-medium">{{ (currentPage - 1) * itemsPerPage + 1 }}</span> to <span class="font-medium">{{ Math.min(currentPage * itemsPerPage, sortedOrders.length) }}</span> of <span class="font-medium">{{ sortedOrders.length }}</span> results
-            </p>
+
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+      <DataTable
+        :columns="columns"
+        :items="orders"
+        :loading="loading"
+        :sort-by="sortBy"
+        :sort-direction="sortDirection"
+        :empty-message="error ? error : 'No orders found'"
+        :actions="actions"
+        :actions-dropdown="true"
+        @sort="handleSort"
+        @action="handleAction"
+        custom-class="overflow-auto max-h-[calc(100vh-362px)]"
+      >
+        <!-- Custom cell templates -->
+        <template #cell(index)="{ item, index }">
+          {{ (pagination.current_page - 1) * pagination.per_page + index + 1 }}
+        </template>
+
+        <template #cell(order_code)="{ item }">
+          <div class="flex items-center">
+            <span class="mr-2">{{ item.order_code }}</span>
+            <button
+              @click.stop="copyOrderCode(item.order_code)"
+              class="p-1 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-md flex items-center justify-center"
+            >
+              <Icon
+                name="heroicons:document-duplicate"
+                class="h-4 w-4 text-gray-600 dark:text-gray-300"
+              />
+            </button>
           </div>
-          <div v-if="totalPages > 1">
-            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-              <button 
-                @click="goToPage(currentPage - 1)" 
-                :disabled="currentPage === 1"
-                class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <span class="sr-only">Previous</span>
-                <Icon name="heroicons:chevron-left" class="h-5 w-5" />
-              </button>
-              
-              <button 
-                v-for="page in pageNumbers" 
-                :key="page" 
-                @click="goToPage(page)" 
-                :class="[
-                  'relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium',
-                  currentPage === page 
-                    ? 'z-10 bg-blue-50 border-blue-500 text-blue-600 dark:bg-blue-900/20 dark:border-blue-400 dark:text-blue-400' 
-                    : 'text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-600'
-                ]"
-              >
-                {{ page }}
-              </button>
-              
-              <button 
-                @click="goToPage(currentPage + 1)" 
-                :disabled="currentPage === totalPages"
-                class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <span class="sr-only">Next</span>
-                <Icon name="heroicons:chevron-right" class="h-5 w-5" />
-              </button>
-            </nav>
+        </template>
+
+        <template #cell(price)="{ item }">
+          <div class="text-right">
+            {{ parseFloat(item.price).toLocaleString() }}
+            {{ item.price_unit || "USD" }}
           </div>
-        </div>
-      </div>
+        </template>
+
+        <template #cell(status)="{ item }">
+          <div class="flex justify-center">
+            <span
+              class="px-2 py-1 text-xs font-medium rounded-full"
+              :class="getStatusInfo(item.status).class"
+            >
+              {{ getStatusInfo(item.status).text }}
+            </span>
+          </div>
+        </template>
+
+        <template #cell(created_at)="{ item }">
+          {{ formatDate(item.created_at) }}
+        </template>
+      </DataTable>
+      <Pagination
+        :current-page="pagination.current_page"
+        :per-page="pagination.per_page"
+        :total="pagination.total"
+        @page-change="handlePageChange"
+        @per-page-change="changePerPage"
+      />
     </div>
   </div>
-</template> 
+</template>
+
+<style>
+.transition-opacity {
+  transition: opacity 0.3s ease;
+}
+</style>

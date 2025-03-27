@@ -11,7 +11,7 @@ export default defineNuxtConfig({
   ],
   devServer: {
     port: 8080,
-    host: '0.0.0.0'
+    // host: '0.0.0.0'
   },
   i18n: {
     defaultLocale: 'en',

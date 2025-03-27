@@ -11,6 +11,8 @@ import ListPage from "~/components/common/ListPage.vue";
 import Modal from "~/components/common/Modal.vue";
 import PackageForm from "~/components/admin/products/PackageForm.vue";
 import LicenseForm from "~/components/admin/products/LicenseForm.vue";
+// Import notification utilities
+import { confirm, notifySuccess, notifyError } from "~/utils/notification";
 
 // Sử dụng API để lấy danh sách sản phẩm
 const { $api } = useNuxtApp();
@@ -217,56 +219,57 @@ const handleAction = ({ action, item }) => {
       showPackageModal.value = true;
       break;
     case "delete":
-      deleteProduct(item.id);
+      confirmDeleteProduct(item.id, item.name);
       break;
   }
 };
 
-// Xử lý thêm package thành công
-const handlePackageSuccess = (data) => {
-  showPackageModal.value = false;
-
-  // Thông báo thành công (có thể sử dụng toast hoặc alert)
-  alert(`Package "${data.name}" added successfully`);
-
-  // Refresh danh sách sản phẩm
-  fetchProducts();
-};
-
-// Xử lý thêm license thành công
-const handleLicenseSuccess = (data) => {
-  showLicenseModal.value = false;
-
-  // Thông báo thành công (có thể sử dụng toast hoặc alert)
-  alert(`License for "${data.email}" added successfully`);
-
-  // Refresh danh sách sản phẩm
-  fetchProducts();
-};
-
-// Xóa sản phẩm
-const deleteProduct = async (id) => {
-  if (confirm("Are you sure you want to delete this product?")) {
-    try {
-      const response = await $api.delete(`api/products/${id}`);
-      if (response.success) {
-        // Refresh danh sách sản phẩm sau khi xóa
-        fetchProducts();
-      } else {
-        alert(response.message || "Failed to delete product");
-      }
-    } catch (err) {
-      console.error("Error deleting product:", err);
-      alert(err.message || "An error occurred while deleting the product");
+// Delete product confirmation
+const confirmDeleteProduct = (id, name) => {
+  confirm(
+    `Are you sure you want to delete product "${name}"? This action cannot be undone.`,
+    'Confirm Delete',
+    {
+      confirmButtonText: 'Delete',
+      cancelButtonText: 'Cancel',
+      type: 'warning',
     }
+  ).then(() => {
+    deleteProduct(id);
+  }).catch(() => {
+    // User cancelled
+  });
+};
+
+// Delete product
+const deleteProduct = async (id) => {
+  try {
+    const response = await $api.delete(`api/products/${id}`);
+    if (response.success) {
+      notifySuccess("Product deleted successfully");
+      // Refresh danh sách sản phẩm sau khi xóa
+      fetchProducts();
+    } else {
+      notifyError(response.message || "Failed to delete product");
+    }
+  } catch (err) {
+    console.error("Error deleting product:", err);
+    notifyError(err.message || "An error occurred while deleting the product");
   }
 };
 
-// Format date
-const formatDate = (dateString) => {
-  if (!dateString) return "";
-  const date = new Date(dateString);
-  return date.toLocaleDateString("vi-VN");
+// Handle package success
+const handlePackageSuccess = () => {
+  showPackageModal.value = false;
+  notifySuccess("Package added successfully");
+  fetchProducts();
+};
+
+// Handle license success
+const handleLicenseSuccess = () => {
+  showLicenseModal.value = false;
+  notifySuccess("License added successfully");
+  fetchProducts();
 };
 
 // Theo dõi thay đổi của route để cập nhật trang

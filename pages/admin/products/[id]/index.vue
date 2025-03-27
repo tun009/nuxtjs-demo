@@ -1,4 +1,6 @@
 <script setup>
+import { confirm, notifySuccess, notifyError } from "~/utils/notification";
+
 definePageMeta({
   middleware: ["admin"],
   layout: "admin",
@@ -98,26 +100,32 @@ const fetchLicenses = async (page = 1) => {
 };
 
 // Xóa license
-const deleteLicense = async (licenseId) => {
-  if (
-    confirm(
-      "Bạn có chắc chắn muốn xóa license này? Hành động này không thể hoàn tác."
-    )
-  ) {
+const deleteLicense = (licenseId) => {
+  confirm(
+    "Bạn có chắc chắn muốn xóa license này không?",
+    "Xác nhận xóa",
+    {
+      confirmButtonText: 'Xóa',
+      cancelButtonText: 'Hủy',
+      type: 'warning',
+    }
+  ).then(async () => {
     try {
-      const response = await $api.delete(`/api/licenses/${licenseId}`);
-
+      const response = await $api.delete(`api/licenses/${licenseId}`);
       if (response.success) {
-        // Xóa thành công, cập nhật lại danh sách
-        await fetchLicenses(licensePagination.value.current_page);
+        notifySuccess("License đã được xóa thành công");
+        // Refresh license list
+        fetchLicenses();
       } else {
-        alert(response.message || "Không thể xóa license");
+        notifyError(response.message || "Không thể xóa license");
       }
     } catch (err) {
       console.error("Error deleting license:", err);
-      alert(err.message || "Đã xảy ra lỗi khi xóa license");
+      notifyError(err.message || "Đã xảy ra lỗi khi xóa license");
     }
-  }
+  }).catch(() => {
+    // Cancelled by user
+  });
 };
 
 // Thêm license mới
@@ -288,6 +296,34 @@ const deleteProduct = () => {
       router.push("/admin/products");
     }, 500);
   }
+};
+
+// Delete package with confirmation
+const confirmDeletePackage = (package_id) => {
+  confirm(
+    "Are you sure you want to delete this package? All associated orders will be affected.",
+    "Confirm Delete",
+    {
+      confirmButtonText: 'Delete',
+      cancelButtonText: 'Cancel',
+      type: 'warning',
+    }
+  ).then(async () => {
+    try {
+      const response = await $api.delete(`api/product-packages/${package_id}`);
+      if (response.success) {
+        notifySuccess("Package deleted successfully");
+        fetchPackages();
+      } else {
+        notifyError(response.message || "Failed to delete package");
+      }
+    } catch (err) {
+      console.error("Error deleting package:", err);
+      notifyError(err.message || "An error occurred while deleting the package");
+    }
+  }).catch(() => {
+    // Cancelled by user
+  });
 };
 
 // Fetch data when component is mounted
