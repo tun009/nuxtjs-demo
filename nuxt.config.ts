@@ -90,9 +90,17 @@ export default defineNuxtConfig({
       },
     ],
   },
+
+  // Thêm cấu hình cho CKEditor 5
+  build: {
+    transpile: ['@ckeditor/ckeditor5-vue', '@ckeditor/ckeditor5-build-classic'],
+  },
   
-  // Cấu hình vite
+  // Cấu hình vite để xử lý CKEditor 5
   vite: {
+    optimizeDeps: {
+      include: ['@ckeditor/ckeditor5-vue', '@ckeditor/ckeditor5-build-classic'],
+    },
     css: {
       preprocessorOptions: {
         scss: {

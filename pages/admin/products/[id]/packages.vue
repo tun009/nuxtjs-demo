@@ -8,6 +8,9 @@ definePageMeta({
 import Modal from "~/components/common/Modal.vue";
 import PackageForm from "~/components/admin/products/PackageForm.vue";
 
+// Import notification utilities
+import { confirm, notifySuccess, notifyError } from "~/utils/notification";
+
 // Sử dụng API để lấy danh sách packages
 const { $api } = useNuxtApp();
 const router = useRouter();
@@ -61,10 +64,7 @@ const fetchData = async () => {
 // Xử lý thêm package thành công
 const handlePackageSuccess = (data) => {
   showPackageModal.value = false;
-
-  // Thông báo thành công (có thể sử dụng toast hoặc alert)
-  alert(`Package "${data.name}" added successfully`);
-
+  notifySuccess(`Package "${data.name}" added successfully`);
   // Refresh danh sách packages
   fetchData();
 };
@@ -82,23 +82,32 @@ const formatPrice = (price, currency) => {
 };
 
 // Xóa package
-const deletePackage = async (packageId) => {
-  if (confirm("Are you sure you want to delete this package?")) {
+const deletePackage = async (id) => {
+  confirm(
+    "Are you sure you want to delete this package?",
+    "Confirm Delete",
+    {
+      confirmButtonText: 'Delete',
+      cancelButtonText: 'Cancel',
+      type: 'warning',
+    }
+  ).then(async () => {
     try {
-      const response = await $api.delete(
-        `api/products/${productId.value}/packages/${packageId}`
-      );
+      const response = await $api.delete(`api/product-packages/${id}`);
       if (response.success) {
-        // Refresh danh sách packages sau khi xóa
+        notifySuccess("Package deleted successfully");
+        // Refresh danh sách packages
         fetchData();
       } else {
-        alert(response.message || "Failed to delete package");
+        notifyError(response.message || "Failed to delete package");
       }
     } catch (err) {
       console.error("Error deleting package:", err);
-      alert(err.message || "An error occurred while deleting the package");
+      notifyError(err.message || "An error occurred while deleting the package");
     }
-  }
+  }).catch(() => {
+    // User cancelled
+  });
 };
 
 // Chạy fetch data khi component được mount

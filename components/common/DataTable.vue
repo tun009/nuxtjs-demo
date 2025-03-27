@@ -39,6 +39,10 @@ const props = defineProps({
     type: String,
     default: "",
   },
+  customClass: {
+    type: String,
+    default: "",
+  },
   // Hướng sắp xếp (asc/desc)
   sortDirection: {
     type: String,
@@ -136,7 +140,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="overflow-x-auto">
+  <div class="overflow-x-auto" :class="customClass">
     <table class="w-full text-left">
       <!-- Table Header -->
       <thead class="bg-gray-50 dark:bg-gray-700 sticky top-0 z-10">

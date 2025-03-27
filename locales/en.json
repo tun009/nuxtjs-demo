@@ -9,7 +9,8 @@
     "logout": "Logout",
     "search": "Search",
     "darkMode": "Dark Mode",
-    "language": "Language"
+    "language": "Language",
+    "learnMore": "Learn More"
   },
   "product": {
     "buy": "Buy Now",
@@ -64,10 +65,61 @@
     "unavailable": "Currently Unavailable",
     "reviews": "Reviews",
     "learnMore": "Learn More",
+    "title": "Products",
+    "subtitle": "Explore our products",
     "notFound": {
       "title": "Product Not Found",
       "description": "The product you're looking for doesn't exist or has been removed.",
       "browseProducts": "Browse Products"
     }
+  },
+  "checkout": {
+    "title": "Checkout",
+    "subtitle": "Complete your purchase",
+    "orderSummary": "Order Summary",
+    "loading": "Loading order information...",
+    "officialProduct": "Official Product",
+    "paymentMethod": "Payment Method",
+    "creditCard": "Credit Card",
+    "bankTransfer": "Bank Transfer",
+    "orderTotal": "Order Total",
+    "subtotal": "Subtotal",
+    "vat": "VAT",
+    "total": "Total",
+    "placeOrder": "Place Order",
+    "processing": "Processing...",
+    "secureCheckout": "Secure Checkout",
+    "tryAgain": "Try Again"
+  },
+  "order": {
+    "confirmationTitle": "Order Confirmed",
+    "confirmationMessage": "Thank you for your purchase! Your order has been successfully placed.",
+    "orderDetails": "Order Details",
+    "orderNumber": "Order Number",
+    "date": "Date",
+    "paymentMethod": "Payment Method",
+    "totalAmount": "Total Amount",
+    "viewDashboard": "View Dashboard",
+    "continueShopping": "Continue Shopping",
+    "loadingOrderDetails": "Loading order details...",
+    "errorTitle": "Error Loading Order",
+    "tryAgain": "Try Again",
+    "backToProducts": "Back to Products"
+  },
+  "user": {
+    "profile": "Profile",
+    "myOrders": "My Orders",
+    "myLicenses": "My Licenses",
+    "accountSettings": "Account Settings",
+    "billingInfo": "Billing Information",
+    "signOut": "Sign Out",
+    "dashboard": "Dashboard"
+  },
+  "error": {
+    "general": "Something went wrong",
+    "notFound": "Page not found",
+    "serverError": "Server error",
+    "unauthorized": "Unauthorized access",
+    "forbidden": "Access forbidden"
   }
 } 
